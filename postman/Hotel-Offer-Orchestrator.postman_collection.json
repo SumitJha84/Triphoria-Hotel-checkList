@@ -1,0 +1,55 @@
+{
+  "info": {
+    "name": "Hotel Offer Orchestrator",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" }
+  ],
+  "item": [
+    {
+      "name": "Fetch hotels for Delhi",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/hotels?city=delhi", "description": "Starts a Temporal workflow and caches the deduplicated Delhi hotels." }
+    },
+    {
+      "name": "Fetch hotels for Mumbai",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/hotels?city=mumbai", "description": "Fetches Mumbai hotels; overlapping names use the cheapest supplier offer." }
+    },
+    {
+      "name": "Fetch hotels with minimum price",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/hotels?city=delhi&minPrice=5000", "description": "Uses Redis ZRANGEBYSCORE to return hotels at or above 5000." }
+    },
+    {
+      "name": "Fetch hotels with maximum price",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/hotels?city=delhi&maxPrice=6000", "description": "Uses Redis ZRANGEBYSCORE to return hotels at or below 6000." }
+    },
+    {
+      "name": "Fetch hotels within price range",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/hotels?city=delhi&minPrice=3000&maxPrice=6000", "description": "Returns Delhi hotels whose prices are in the inclusive range." }
+    },
+    {
+      "name": "Request for city with no results",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/hotels?city=chennai", "description": "Returns an empty array and caches no stale hotels." }
+    },
+    {
+      "name": "Request with missing city",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/hotels", "description": "Expected status: 400 INVALID_CITY." }
+    },
+    {
+      "name": "Request with invalid price parameters",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/hotels?city=delhi&minPrice=7000&maxPrice=5000", "description": "Expected status: 400 INVALID_PRICE_RANGE." }
+    },
+    {
+      "name": "Health check",
+      "request": { "method": "GET", "url": "{{baseUrl}}/health", "description": "Checks Express, Redis, Temporal, and both mock suppliers." }
+    },
+    {
+      "name": "Supplier A mock endpoint",
+      "request": { "method": "GET", "url": "{{baseUrl}}/supplierA/hotels?city=delhi", "description": "Returns Supplier A's raw Delhi mock dataset." }
+    },
+    {
+      "name": "Supplier B mock endpoint",
+      "request": { "method": "GET", "url": "{{baseUrl}}/supplierB/hotels?city=mumbai", "description": "Returns Supplier B's raw Mumbai mock dataset." }
+    }
+  ]
+}
